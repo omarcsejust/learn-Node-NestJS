@@ -6,15 +6,15 @@ import { CreateTaskDto } from './task.dto';
 export class TaskController {
     constructor (private taskService: TaskService){}
 
+    @Post()
+    @UsePipes(ValidationPipe)
+    async addTask(@Body() task: CreateTaskDto){
+        return await this.taskService.addTask(task)
+    }
+
     @Get()
     public getTasks(){
         return this.taskService.getAllTasks()
-    }
-
-    @Post()
-    @UsePipes(ValidationPipe)
-    public addTask(@Body() task: CreateTaskDto){
-        return this.taskService.addTask(task)
     }
 
     @Get('/:id')

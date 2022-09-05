@@ -1,19 +1,22 @@
 import { IsNotEmpty, IsNumber, Length } from "class-validator";
 
-export class CreateTaskDto{
+export class TaskDto{
     @IsNotEmpty({'message': 'ID can not be empty!'})
     @IsNumber()
     id: number;
+}
 
+
+export class CreateTaskDto{
     @IsNotEmpty()
     @Length(5, 255)
     title: string;
 
     @IsNotEmpty()
     @Length(10)
-    desc: string;
+    desc: string; 
 
-    status: string;
+    status: number;
 }
 
 

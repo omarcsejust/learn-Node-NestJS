@@ -1,19 +1,48 @@
-import { BaseEntity, Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { BaseEntity, Column, CreateDateColumn, Entity, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 @Entity('tasks')
-export class TaskEntity extends BaseEntity{
+export class TaskEntity{
     @PrimaryGeneratedColumn()
-    id: number
+    id: number;
+
+    @Column({
+        type: 'varchar',
+        length: 500,
+        nullable: false
+    })
+    title: string;
+
+    @Column('text')
+    desc: string;
 
     @Column()
-    title: string
+    status: number;
 
-    @Column()
-    desc: string
+    @CreateDateColumn()
+    created_at: Date;
+
+    @UpdateDateColumn()
+    updated_at: Date;
 
     @Column({
         type: 'boolean',
         default: true,
     })
-    isActive: boolean
+    is_active: boolean;
 }
+
+
+@Entity('task_statuses')
+export class TaskStatusEntity{
+    @PrimaryGeneratedColumn()
+    id: number;
+
+    @Column({
+        type: 'varchar',
+        length: 50,
+        unique: true,
+        nullable: false
+    })
+    status: string;
+}
+
