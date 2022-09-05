@@ -1,8 +1,8 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { HttpException, Injectable, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { resolve } from 'path';
 import { Repository } from 'typeorm';
-import { CreateTaskDto } from './task.dto';
+import { CreateTaskDto, TaskDto, UpdateTaskDto } from './task.dto';
 import { TaskEntity } from './task.entity';
 import { TASKS } from './tasks.mock';
 
@@ -15,7 +15,8 @@ export class TaskService {
         private taskRepository: Repository<TaskEntity>
     ){}
 
-    async addTask(task: CreateTaskDto){
+    async addTask(createTaskDto: CreateTaskDto): Promise<TaskEntity>{
+        const task = this.taskRepository.create(createTaskDto)
         return await this.taskRepository.save(task)
     }
 
@@ -23,18 +24,35 @@ export class TaskService {
         return this.taskRepository.find();
     }
 
-    public getTaskById(id: number): Promise<TaskEntity>{
+    async getTaskById(id: number): Promise<TaskEntity>{
         const taskId = Number(id);  // Need to convert id to Number
-        return this.taskRepository.findOneBy({id: id})
-    }
-
-    public deleteTask(id: number){
-        const index = this.tasks.findIndex(task => task.id === id)
-        if(index === -1){
-            throw new HttpException('Not found!', 404);
+        const task = await this.taskRepository.findOneBy({id: id});
+        if(task == null){
+            throw new HttpException('Task not found!', HttpStatus.NOT_FOUND);
         }
 
-        return this.tasks.splice(index, 1)
+        return task;
+    }
+
+    async updateTask(id: number, updateTaskDto: UpdateTaskDto): Promise<TaskEntity>{
+        const taskId = Number(id);
+        await this.taskRepository.update(taskId, updateTaskDto);
+        const task = await this.taskRepository.findOneBy({id: taskId});
+        if(task == null){
+            throw new HttpException('Task not found!', HttpStatus.NOT_FOUND);
+        }
+
+        return task;
+    }
+
+    async deleteTask(id: number){
+        const taskTd = Number(id)
+        const deletedTask = await this.taskRepository.delete({id: taskTd});
+        if(!deletedTask.affected){
+            throw new HttpException('Task not found!', HttpStatus.NOT_FOUND);
+        }
+
+        return {deleted: true};
     }
 
 
